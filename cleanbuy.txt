@@ -1,4 +1,5 @@
  //@version=6
+//Educational Use Only | Not Financial Advice | Use at Your Own Risk
 indicator("Mishra - Clean BUY Signals", overlay=true)
 
 // Settings
