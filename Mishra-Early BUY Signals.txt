@@ -1,0 +1,135 @@
+
+ //@version=6
+indicator("Mishra - Early BUY Signals", overlay=true)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SETTINGS
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+rsiLength = input.int(14, "RSI Length")
+rsiMinimum = input.float(50, "RSI Minimum Level")
+emaLength = input.int(20, "EMA Length")
+
+cooldownMinutes = input.int(30, "BUY Cooldown (Minutes)", minval=1)
+maxBuy = input.int(4, "Maximum BUY Trades Per Day", minval=1)
+maxDistance = input.float(20, "Maximum Distance from VWAP (Points)", minval=0)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// INDICATORS
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+rsiValue = ta.rsi(close, rsiLength)
+ema20 = ta.ema(close, emaLength)
+vwapValue = ta.vwap(hlc3)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// DAILY RESET
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+var int lastBuyTime = na
+var int buyCount = 0
+
+if timeframe.change("1D")
+    lastBuyTime := na
+    buyCount := 0
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CHECK 1: VWAP DIRECTION
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+vwapCondition = close > vwapValue
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CHECK 2: PRICE ACTION BREAKOUT
+// Bullish candle closes above previous candle high
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+bullishCandle = close > open
+breakoutCondition = close > high[1] and bullishCandle
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CHECK 3: RSI MOMENTUM
+// RSI above 50 and rising
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+rsiCondition = rsiValue > rsiMinimum and rsiValue > rsiValue[1]
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CHECK 4: DISTANCE FROM VWAP
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+vwapDistance = math.abs(open - vwapValue)
+distanceCondition = vwapDistance < maxDistance
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TREND CLASSIFICATION
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+trendingMarket = vwapValue < ema20
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CHECK 5: COOLDOWN
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+cooldownMs = cooldownMinutes * 60 * 1000
+
+cooldownPassed = na(lastBuyTime) or
+     (time - lastBuyTime >= cooldownMs)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CHECK 6: DAILY BUY LIMIT
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+tradeLimitPassed = buyCount < maxBuy
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// FINAL BUY CONDITION
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+buyCondition = vwapCondition and
+     breakoutCondition and
+     rsiCondition and
+     distanceCondition
+
+buySignal = buyCondition and
+     cooldownPassed and
+     tradeLimitPassed and
+     barstate.isconfirmed
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// RECORD BUY SIGNAL
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+if buySignal
+    lastBuyTime := time
+    buyCount += 1
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PLOT INDICATORS
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+plot(ema20, title="EMA20", color=color.black, linewidth=1)
+plot(vwapValue, title="VWAP", color=color.blue, linewidth=1)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// BUY SIGNALS
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+plotshape(
+     buySignal and trendingMarket,
+     title="TRENDING BUY",
+     style=shape.arrowup,
+     location=location.belowbar,
+     color=color.green,
+     size=size.huge
+)
+
+plotshape(
+     buySignal and not trendingMarket,
+     title="BUY",
+     style=shape.arrowup,
+     location=location.belowbar,
+     color=color.blue,
+     size=size.huge
+)
+
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ALERTS
+//━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+alertcondition(
+     buySignal and trendingMarket,
+     title="TRENDING BUY Alert",
+     message="TRENDING BUY - VWAP + Price Breakout + RSI Momentum"
+)
+
+alertcondition(
+     buySignal and not trendingMarket,
+     title="BUY Alert",
+     message="BUY - VWAP + Price Breakout + RSI Momentum"
+)
