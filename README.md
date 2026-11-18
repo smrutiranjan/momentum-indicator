@@ -1,3 +1,4 @@
+SetupA:
 1.Price check: 5-minute candle OPEN must be above both EMA20 and VWAP.
 2.RSI check: RSI(14) must be greater than 60.(rsi must be move from rsi 40 to 60 on current day)
 3.Absolute difference between candle OPEN and VWAP/ema20 is less than 12 points.
@@ -13,11 +14,6 @@ Signal classification:
    VWAP below EMA20.
 - BUY
    VWAP equal to or above EMA20.
-SetupA:
-1.RSI enters the 40–60 range during the day and running above 60 now.
-2.Candle OPEN is above EMA20 and VWAP
-3.Distance from the selected indicator is less than 12 points.
-Note: most of case use open to compare
 
 SetupB:
  1. Same as setup A
