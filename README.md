@@ -1,4 +1,5 @@
 SetupA:
+
 1.Price check: 5-minute candle OPEN must be above both EMA20 and VWAP.
 2.RSI check: RSI(14) must be greater than 60.(rsi must be move from rsi 40 to 60 on current day)
 3.Absolute difference between candle OPEN and VWAP/ema20 is less than 12 points.
@@ -16,13 +17,13 @@ Signal classification:
    VWAP equal to or above EMA20.
 
 SetupB:
+
  1. Same as setup A
  2. Use cooldown time, compare with price candle close not open
 
-    
-Daily BUY count is below 4.
 Setup C:
-Updated entry logic
+
+Updated logic
 1. VWAP: Candle closes above VWAP.
 2. Price action: Bullish candle closes above the previous candle's high.
 3. EMA20: Displayed for trend reference, but not compulsory for entry.
