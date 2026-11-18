@@ -13,6 +13,28 @@ Signal classification:
    VWAP below EMA20.
 - BUY
    VWAP equal to or above EMA20.
+SetupA:
+1.RSI enters the 40–60 range during the day and running above 60 now.
+2.Candle OPEN is above EMA20 and VWAP
+3.Distance from the selected indicator is less than 12 points.
+Note: most of case use open to compare
+
+SetupB:
+ 1. Same as setup A
+ 2. Use cooldown time, compare with price candle close not open
+
+    
+Daily BUY count is below 4.
+Setup C:
+Updated entry logic
+1. VWAP: Candle closes above VWAP.
+2. Price action: Bullish candle closes above the previous candle's high.
+3. EMA20: Displayed for trend reference, but not compulsory for entry.
+4. RSI: Must be rising, with RSI above 50 (configurable).
+5. Distance: Open price must be within the configured distance from VWAP.
+6. Cooldown: 30 minutes between BUY signals.
+7. Daily limit: Maximum 4 BUY signals per day.
+
 
 ## Disclaimer – Important Risk Warning
 
