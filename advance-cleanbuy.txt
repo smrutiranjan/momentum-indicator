@@ -1,6 +1,6 @@
-
  //@version=6
-indicator("Mishra - Clean BUY Signals", overlay=true)
+//Setup B
+indicator("Mishra - Adv Clean BUY Signals", overlay=true)
 
 // Settings
 rsiLength = input.int(14, "RSI Length")
